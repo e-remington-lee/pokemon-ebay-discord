@@ -1,3 +1,5 @@
+import os
+
 import discord
 from discord import app_commands
 
@@ -8,6 +10,7 @@ class PriceBot(discord.Client):
         intents.message_content = True
         super().__init__(intents=intents)
         self.tree = app_commands.CommandTree(self)
+        self.general_channel = None
 
     async def setup_hook(self):
         await self.tree.sync()
@@ -15,6 +18,21 @@ class PriceBot(discord.Client):
     async def on_ready(self):
         print(f"Logged in as {self.user} (ID: {self.user.id})")
         print("------")
+
+        channel_id = os.getenv("DISCORD_CHANNEL_ID")
+        if channel_id:
+            self.general_channel = self.get_channel(int(channel_id))
+            if self.general_channel:
+                await self.general_channel.send("Price bot is online!")
+            else:
+                print(f"Warning: Could not find channel {channel_id}")
+        else:
+            print("Warning: DISCORD_CHANNEL_ID not set in .env")
+
+    async def post_to_channel(self, content=None, embed=None):
+        """Send a message to the general channel."""
+        if self.general_channel:
+            await self.general_channel.send(content=content, embed=embed)
 
 
 def create_bot() -> PriceBot:
