@@ -48,42 +48,42 @@ SEARCH_TARGETS: list[SearchTarget] = [
         keywords="Nintendo Pokémon TCG Jungle 1995 Japanese sealed booster pack",
         min_price=700,
         category_id=CCG_SEALED_BOOSTER_PACKS,  # or CCG_SEALED_BOOSTER_PACKS, etc.
-        required=["1995", "Jungle", "Japanese"],  # fill in: listing titles must contain ALL of these
+        required=["Jungle", "Japanese"],  # fill in: listing titles must contain ALL of these
     ),
     SearchTarget(
         name="Neo 2",
         keywords="2000 Pokemon Japanese Neo 2 Discovery Booster packs",
         min_price=700,
         category_id=CCG_SEALED_BOOSTER_PACKS,  # or CCG_SEALED_BOOSTER_PACKS, etc.
-        required=["2000", "Neo", "Japanese"],  # fill in: listing titles must contain ALL of these
+        required=["Neo", "Japanese"],  # fill in: listing titles must contain ALL of these
     ),
     SearchTarget(
         name="Gym 2",
         keywords="1996 Pokemon Japanese Gym Challenge 2 Booster Packs",
         min_price=700,
         category_id=CCG_SEALED_BOOSTER_PACKS,  # or CCG_SEALED_BOOSTER_PACKS, etc.
-        required=["1996", "Gym", "Japanese"],  # fill in: listing titles must contain ALL of these
+        required=["Gym", "Japanese"],  # fill in: listing titles must contain ALL of these
     ),
     SearchTarget(
         name="Fossil",
         keywords="1997 JAPANESE POKEMON FOSSIL BOOSTER PACK",
         min_price=700,
         category_id=CCG_SEALED_BOOSTER_PACKS,  # or CCG_SEALED_BOOSTER_PACKS, etc.
-        required=["1997", "Fossil", "Japanese"],  # fill in: listing titles must contain ALL of these
+        required=["Fossil", "Japanese"],  # fill in: listing titles must contain ALL of these
     ),
     SearchTarget(
         name="Rocket Gang",
         keywords="1997 Pokemon Japanese Rocket Gang sealed booster pack",
         min_price=700,
         category_id=CCG_SEALED_BOOSTER_PACKS,  # or CCG_SEALED_BOOSTER_PACKS, etc.
-        required=["1997", "Rocket", "Japanese"],  # fill in: listing titles must contain ALL of these
+        required=["Rocket", "Japanese"],  # fill in: listing titles must contain ALL of these
     ),
     SearchTarget(
         name="Neo Gen",
         keywords="1999 Pokemon Japanese Neo Genesis Booster sealed booster pack",
         min_price=700,
         category_id=CCG_SEALED_BOOSTER_PACKS,  # or CCG_SEALED_BOOSTER_PACKS, etc.
-        required=["1999", "Neo", "Japanese"],  # fill in: listing titles must contain ALL of these
+        required=["Neo", "Japanese"],  # fill in: listing titles must contain ALL of these
     ),
 ]
 

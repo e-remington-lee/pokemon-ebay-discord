@@ -86,3 +86,7 @@ pokemon-ebay-price/
 └── bot/
     └── discord_bot.py   # Discord bot logic
 ```
+
+
+## Testing Ebay 
+ python -m bot.ebay_client "Nintendo Pokémon TCG Jungle 1995 Japanese sealed booster pack" --min-price 700

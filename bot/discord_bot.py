@@ -66,6 +66,19 @@ class PriceBot(discord.Client):
             self.ebay = EbayClient()  # one shared client so the OAuth token gets reused
         except EbayAPIError as e:
             print(f"Warning: eBay disabled: {e}")
+        self._commands_synced = False
+
+    async def sync_commands(self):
+        """
+        Register slash commands directly on each server the bot is in. Per-server commands
+        show up instantly; global ones can take a long time to appear after a change.
+        Global commands are then cleared so each command isn't listed twice.
+        """
+        for guild in self.guilds:
+            self.tree.copy_global_to(guild=guild)
+            synced = await self.tree.sync(guild=guild)
+            print(f"Synced commands to {guild.name}: {', '.join('/' + c.name for c in synced)}")
+        self.tree.clear_commands(guild=None)
         await self.tree.sync()
 
     async def close(self):
@@ -76,6 +89,11 @@ class PriceBot(discord.Client):
     async def on_ready(self):
         print(f"Logged in as {self.user} (ID: {self.user.id})")
         print("------")
+
+        # on_ready can fire again after a reconnect; only sync once per run.
+        if not self._commands_synced:
+            self._commands_synced = True
+            await self.sync_commands()
 
         channel_id = os.getenv("DISCORD_CHANNEL_ID")
         if channel_id:
@@ -137,13 +155,62 @@ def create_bot() -> PriceBot:
                 limit=FETCH_LIMIT,
                 min_price=target.min_price,
                 category_id=target.category_id,
-                sort="price",
+                # No sort="price": eBay's price sort matches keywords much more strictly and
+                # returned 0 results for searches that otherwise match. We sort locally instead.
             )
         except EbayAPIError as e:
             await interaction.followup.send(f"eBay request failed: {str(e)[:1800]}")
             return
 
         await interaction.followup.send(embed=build_listings_embed(target, total, listings))
+
+    @bot.tree.command(name="explain", description="How to use the price bot")
+    async def explain(interaction: discord.Interaction):
+        embed = discord.Embed(
+            title="How to use the price bot",
+            description=(
+                "This bot searches **active eBay listings** for a fixed set of sealed "
+                "Japanese Pokémon booster packs and shows what they're listed for."
+            ),
+            color=discord.Color.blue(),
+        )
+        embed.add_field(
+            name="/price <item>",
+            value=(
+                "Search eBay for one tracked item. Start typing after `/price` and pick from "
+                "the dropdown, e.g. `/price Jungle`.\n"
+                f"Returns up to {FETCH_LIMIT} listings, cheapest first, with links."
+            ),
+            inline=False,
+        )
+
+        lines = []
+        for t in active_targets():
+            floor = f" · min ${t.min_price:,.0f}" if t.min_price else ""
+            required = [w for w in t.required if w.strip()]
+            must = f" · must contain: {', '.join(required)}" if required else ""
+            lines.append(f"**{t.name}**{floor}{must}")
+        embed.add_field(
+            name="Tracked items",
+            value="\n".join(lines)[:1024] if lines else "None configured yet.",
+            inline=False,
+        )
+        embed.add_field(
+            name="How results are filtered",
+            value=(
+                "• Listings below the item's minimum price are skipped.\n"
+                "• Listings whose title is missing any of the item's required words are dropped.\n"
+                "• The footer shows how many were fetched and how many were filtered out."
+            ),
+            inline=False,
+        )
+        embed.add_field(name="/ping", value="Check that the bot is online.", inline=False)
+        embed.add_field(name="/explain", value="Show this message.", inline=False)
+        embed.set_footer(
+            text="Prices are current asking prices, not sold prices. "
+            "Tracked items are configured in bot/search_targets.py."
+        )
+        await interaction.response.send_message(embed=embed)
 
     @bot.tree.command(name="ping", description="Check if the bot is responsive")
     async def ping(interaction: discord.Interaction):
